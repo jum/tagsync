@@ -61,9 +61,6 @@ func doFile(_ fileName: String, source: SyncSource, attr: NSDictionary, verbose:
 			}
 		}
 	}
-	if let tagArray = try url.resourceValues(forKeys:[.tagNamesKey]).tagNames {
-		print(tagArray)
-	}
 	var iptcTags = getIPTCTags(url)
 	var finderModified = false
 	var iptcModified = false
