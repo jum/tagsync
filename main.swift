@@ -65,7 +65,7 @@ func doFile(_ fileName: String, source: SyncSource, attr: NSDictionary, verbose:
 	var finderModified = false
 	var iptcModified = false
 	if (verbose) {
-		print(fileName, "finder", finderTags, "iptc", iptcTags)
+		print("finder", finderTags, "iptc", iptcTags)
 	}
 	switch source  {
 		case .finder:
@@ -128,7 +128,9 @@ command(
 						try processItem(fileName + "/" + item)
 					}
 				case FileAttributeType.typeRegular.rawValue:
-					debugPrint("doing item \(fileName)")
+					if verbose || dryrun {
+						print("File \(fileName):")
+					}
 					try doFile(fileName, source: source, attr: attr, verbose: verbose, dryrun: dryrun)
 				case let ftype:
 					throw ArgumentParserError("Unable to process file \(fileName): type \(ftype)")
