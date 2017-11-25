@@ -37,8 +37,8 @@ func getIPTCTags(_ url: URL) -> Set<String> {
 	var tags = Set<String>()
 	if let source = CGImageSourceCreateWithURL(url as CFURL, nil) {
 		if let props = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [String: Any] {
-			if let iptc = props["{IPTC}"] as? [String: Any] {
-				if let kw = iptc["Keywords"] as? [String] {
+			if let iptc = props[kCGImagePropertyIPTCDictionary as String] as? [String: Any] {
+				if let kw = iptc[kCGImagePropertyIPTCKeywords as String] as? [String] {
 					tags.formUnion(kw)
 				}
 			}
