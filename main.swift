@@ -93,7 +93,7 @@ func doFile(_ fileName: String, source: SyncSource, attr: NSDictionary, verbose:
 	var finderModified = false
 	var iptcModified = false
 	if (verbose) {
-		print("finder", finderTags, "iptc", iptcTags)
+		print("finder:", finderTags, "iptc:", iptcTags)
 	}
 	switch source  {
 		case .finder:
