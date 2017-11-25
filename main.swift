@@ -47,6 +47,34 @@ func getIPTCTags(_ url: URL) -> Set<String> {
 	return tags
 }
 
+func setIPCTags(_ url: URL, tags: Set<String>) throws {
+	let fm = FileManager.default
+	if let source = CGImageSourceCreateWithURL(url as CFURL, nil) {
+		if let UTI = CGImageSourceGetType(source) {
+			let destUrl = url.appendingPathExtension("tmp")
+			if let dest = CGImageDestinationCreateWithURL(destUrl as CFURL, UTI, 1, nil) {
+				let meta = CGImageMetadataCreateMutable()
+				let tag = CGImageMetadataTagCreate(kCGImageMetadataNamespaceIPTCCore, kCGImageMetadataPrefixIPTCCore, kCGImagePropertyIPTCKeywords, .arrayUnordered, Array(tags) as CFTypeRef)!
+				CGImageMetadataSetTagWithPath(meta, nil, "dc:subject" as CFString, tag)
+				let options: [String: Any] = [
+					kCGImageDestinationMergeMetadata as String: true,
+					kCGImageDestinationMetadata as String : meta
+				]
+				var error: Unmanaged<CFError>?
+				withUnsafeMutablePointer(to: &error) { ptr in
+					if !CGImageDestinationCopyImageSource(dest, source, options as CFDictionary, ptr) {
+						debugPrint(error.debugDescription)
+					}
+				}
+				if !CGImageDestinationFinalize(dest) {
+					debugPrint("did not finalize")
+				}
+				try fm.replaceItem(at: url, withItemAt: destUrl, backupItemName: nil, options: [], resultingItemURL: nil)
+			}
+		}
+	}
+}
+
 func doFile(_ fileName: String, source: SyncSource, attr: NSDictionary, verbose: Bool, dryrun: Bool) throws {
 	let url = URL(fileURLWithPath: fileName)
 	var finderTags = Set<String>()
@@ -104,6 +132,9 @@ func doFile(_ fileName: String, source: SyncSource, attr: NSDictionary, verbose:
 	if iptcModified {
 		if verbose || dryrun {
 			print("new iptc", iptcTags)
+		}
+		if !dryrun {
+			try setIPCTags(url, tags: iptcTags)
 		}
 	}
 }
