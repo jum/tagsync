@@ -61,10 +61,12 @@ func setIPCTags(_ url: URL, tags: Set<String>) throws {
 					kCGImageDestinationMetadata as String : meta
 				]
 				var error: Unmanaged<CFError>?
+				var res = false
 				withUnsafeMutablePointer(to: &error) { ptr in
-					if !CGImageDestinationCopyImageSource(dest, source, options as CFDictionary, ptr) {
-						debugPrint(error.debugDescription)
-					}
+					res = CGImageDestinationCopyImageSource(dest, source, options as CFDictionary, ptr)
+				}
+				if !res {
+					debugPrint(error.debugDescription)
 				}
 				if !CGImageDestinationFinalize(dest) {
 					debugPrint("did not finalize")
